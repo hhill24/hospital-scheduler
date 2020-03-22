@@ -22,6 +22,7 @@ public class Appointment {
 	
 
 	public Date getDate() {
+		//comment test
 		return date;
 	}
 	
