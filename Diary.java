@@ -1,22 +1,34 @@
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 
  * SAME AS BINARYTREE CLASS
+ * USE DATE AS ID
  *
  */
 public class Diary {
+	HealthProfessional owner;
 	Appointment root;
 	Appointment currentNode;
 	Appointment lastEditedNode;
 	Appointment previousNode;
+	Set<Date> busy;
 	
 	public Diary() {
 		root = null;
 		currentNode = root;
 		lastEditedNode = null;
 		previousNode = null;
+		owner = null;
+		busy = new HashSet<>();
 	}
 	
+	
+	public HealthProfessional getOwner() {
+		return owner;
+	}
 	/**
 	 * deletes a single Appointment node from Diary tree
 	 */
@@ -36,6 +48,51 @@ public class Diary {
 	 */
 	public void editAppointment() {
 		
+	}
+	
+	/**
+	 * Traverses Diary comparing appointment IDs to wanted id until found
+	 *  Returns null if not found
+	 * 
+	 * @param wantedID
+	 * @return found node or null
+	 */
+	public Appointment findInDiary(int wantedID) {
+		Appointment upto = root;
+		previousNode = null;
+		boolean found = false;
+		while (upto != null && !found) {
+			if (upto.getID() == wantedID) {
+				found = true;
+			} else {
+				if (wantedID < upto.getID()) {
+					previousNode = upto;
+					upto = upto.getLeft();
+				} else {
+					previousNode = upto;
+					upto = upto.getRight();
+				}
+			}
+		}
+		if (found) {
+			return upto;
+		} else {
+			return null;
+		}
+	}
+	
+	
+	public Set<Date> createBusy(Appointment node) {
+
+		if (node != null) {
+			currentNode = node.getLeft();
+			createBusy(currentNode);
+			busy.add(node.getDate());
+			currentNode = node.getRight();
+			createBusy(currentNode);
+		}
+
+		return busy;
 	}
 	
 	/**
@@ -60,4 +117,3 @@ public class Diary {
 	}
 	
 	}
-
