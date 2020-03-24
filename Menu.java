@@ -1,9 +1,8 @@
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
-
-
-
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -11,6 +10,7 @@ public class Menu {
 	
 	Scanner s = new Scanner(System.in);
 	Set<Diary> diaries;
+	Map<Integer,Patient> patients;
 
 	
 	public Menu() {
@@ -19,6 +19,7 @@ public class Menu {
 	
 	public void initialise() {
 		diaries =new HashSet<>();
+		patients = new HashMap<>();
 	}
 	
 	public int displayMenu() {
@@ -93,29 +94,41 @@ public class Menu {
 	 */
 	public void scheduleAppointment() {
 		
-		int[] startInt = {0,0,0};
-		int[] endInt = {0,0,0};
+		int[] startInt = {0,0,0,0};
+		int[] endInt = {0,0,0,0};
 
 		System.out.println("Enter List of Health Professionals involved, separated by commas:");
 		String input = s.next();
 		String[] professionals = input.split(",");
 		
-		System.out.println("Enter start date in format YYYY/MM/DD");
+		System.out.println("Enter start date in format YYYY/MM/DD/HH");
 		String start = s.next();
 		String[] startDateString = start.split("/");
-		System.out.println("Enter end date in format YYYY/MM/DD");
+		
+		System.out.println("Enter end date in format YYYY/MM/DD/HH");
 		String end = s.next();
 		String[] endDateString= end.split("/");
 		
+		System.out.println("Enter location");
+		String location = s.next();
 		
-		for (int i=0; i<3; i++) {
+		System.out.println("Enter treatment");
+		String treatment = s.next();
+		
+		System.out.println("Enter patient ID");
+		int id = s.nextInt();
+		Patient patient = patients.get(id);
+		
+		
+		
+		for (int i=0; i<4; i++) {
 			startInt[i]=Integer.parseInt(startDateString[i]);
 			endInt[i]=Integer.parseInt(endDateString[i]);
 
 		}
 
-		Date startDate = new Date(startInt[0], startInt[1], startInt[2]);
-		Date endDate = new Date(endInt[0], endInt[1], endInt[2]);
+		Date startDate = new Date(startInt[0], startInt[1], startInt[2],startInt[3], 0, 0);
+		Date endDate = new Date(endInt[0], endInt[1], endInt[2],endInt[3],0,0);
 		
 		//creates a set of the diaries of the needed health professionals
 		Set<Diary> neededHPs = new HashSet<>();
@@ -141,10 +154,30 @@ public class Menu {
 		}
 		
 		//find earliest date between start and end not in allBusy
-		//add appointment with this date to all health professionals in neededHPs
+		boolean found = false;
+		Date appointment = startDate;
+		while (appointment.getDate() < endDate.getDate() ) {
+			if(allBusy.contains(appointment)) {
+				appointment.setHours(appointment.getHours()+1);
+			}else {
+				found = true;
+			}
+		}
+		
+		//adds appointment to all necessary diaries if found
+		if (found) {
+		for (Diary d: neededHPs) {
+			Appointment a = new Appointment(appointment,location,patient,treatment);
+			d.addAppointment(a);
+		}
+		}else {
+			System.out.println("No availabile spaces for appointment");
+		}
 		
 
 	}
+	
+	
 	
 	
 	/**
