@@ -1,10 +1,13 @@
+ import java.util.Date;
+
+/**
  * 
  * SAME AS TREE NODE CLASS
  *
  */
 public class Appointment {
 	Date date;
-	Date endTime;
+	//Date endTime;
 	String location;
 	Patient patient;
 	String treatment;
@@ -14,13 +17,27 @@ public class Appointment {
 	
 	public Appointment() {
 		date=null;
-		endTime=null;
+		//endTime=null;
 		location="";
 		patient=null;
 		treatment="";
 		ID ++;
+		leftNode=null;
+		rightNode=null;
+		
 	}
 	
+
+	public Appointment(Date theDate, String theLoc, Patient patient, String theTreatment) {
+		date=null;
+		//endTime=null;
+		location="";
+		patient=null;
+		treatment="";
+		ID ++;
+		leftNode=null;
+		rightNode=null; 
+	}
 
 	public Appointment getLeft() {
 		return leftNode;
@@ -39,9 +56,9 @@ public class Appointment {
 		return ID;
 	}
 	
-	public Date getEndTime() {
-		return endTime;
-	}
+//	public Date getEndTime() {
+//		return endTime;
+//	}
 	
 	public String getLocation() {
 		return location;
