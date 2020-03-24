@@ -39,7 +39,7 @@ public class Diary {
 	/**
 	 * adds a single Appointment node to Diary tree
 	 */
-	public void addAppointment() {
+	public void addAppointment(Appointment a) {
 		
 	}
 	
@@ -117,3 +117,4 @@ public class Diary {
 	}
 	
 	}
+
