@@ -6,70 +6,97 @@
  *
  */
 public class Appointment {
-	Date date;
-	//Date endTime;
-	String location;
-	Patient patient;
-	String treatment;
-	int ID=0;
-	private Appointment leftNode;
-	private Appointment rightNode;
-	
-	public Appointment() {
-		date=null;
-		//endTime=null;
-		location="";
-		patient=null;
-		treatment="";
-		ID ++;
-		leftNode=null;
-		rightNode=null;
-		
-	}
-	
+    Date date;
+    //Date endTime;
+    String location;
+    Patient patient;
+    String treatment;
+    int ID=0;
+    private Appointment leftNode;
+    private Appointment rightNode;
+    
+    public Appointment() {
+        date=null;
+        //endTime=null;
+        location="";
+        patient=null;
+        treatment="";
+        ID ++;
+        leftNode=null;
+        rightNode=null;
+        
+    }
+    
 
-	public Appointment(Date theDate, String theLoc, Patient patient, String theTreatment) {
-		date=null;
-		//endTime=null;
-		location="";
-		patient=null;
-		treatment="";
-		ID ++;
-		leftNode=null;
-		rightNode=null; 
-	}
+    public Appointment(Date theDate, String theLoc, Patient patient, String theTreatment) {
+        date=null;
+        //endTime=null;
+        location="";
+        patient=null;
+        treatment="";
+        ID ++;
+        leftNode=null;
+        rightNode=null; 
+    }
 
-	public Appointment getLeft() {
-		return leftNode;
-	}
-	
-	public Appointment getRight() {
-		return rightNode;
-	}
-	
-	public Date getDate() {
-		//comment test
-		return date;
-	}
-	
-	public int getID() {
-		return ID;
-	}
-	
-//	public Date getEndTime() {
-//		return endTime;
-//	}
-	
-	public String getLocation() {
-		return location;
-	}
-	
-	public Patient getPatient() {
-		return patient;
-	}
-	
-	public String getTreatment() {
-		return treatment;
-	}
-	
+    public Appointment getLeft() {
+        return leftNode;
+    }
+    
+    public Appointment getRight() {
+        return rightNode;
+    }
+    
+    public Date getDate() {
+        //comment test
+        return date;
+    }
+    
+    public int getID() {
+        return ID;
+    }
+    
+    //  public Date getEndTime() {
+    //      return endTime;
+    //  }
+    
+    public String getLocation() {
+        return location;
+    }
+    
+    public Patient getPatient() {
+        return patient;
+    }
+    
+    public String getTreatment() {
+        return treatment;
+    }
+    
+    public void setID(int newID){
+        ID = newID;
+    }
+    
+    public void setDate(Date newDate) {
+        date = newDate;
+    }
+    
+    public void setPatient(Patient newPatient) {
+        patient = newPatient;
+    }
+    
+    public void setLocation(String newLocation) {
+        location = newLocation;
+    }
+    
+    public void setTreatment(String newTreatment) {
+        treatment = newTreatment;
+    }
+    
+    public void setLeft(Appointment newLeftNode) {
+        leftNode = newLeftNode;
+    }
+    
+    public void setRight(Appointment newRightNode) {
+        rightNode = newRightNode;
+    }
 }
