@@ -1,42 +1,79 @@
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.Stack;
 
+/**
+ * 
+ * runs the hospital scheduling program
+ *
+ */
 public class Menu {
 	
 	Scanner s = new Scanner(System.in);
-	Set<Diary> diaries;
-	Map<Integer,Patient> patients;
+	Set<Diary> diaries; //contains the diary trees of all employees
+	Map<Integer,Patient> patients; // maps patient instances to a unique id
+	Stack<String> actions; //stack of actions (add, edit or delete) to track most recent change made
+	Diary lastEdited; //keeps track of the last employee diary to be edited
+	Appointment lastEditedApp; //keeps track of the last appointment to be added/deleted
+	Appointment lastEditMade; //keeps track of the last appointment to be changed.
 
-	
+	/**
+	 * default constructor sets Set of diaries to null;
+	 */
 	public Menu() {
 		diaries=null;
 	}
 	
+	/**
+	 * initialises the data structures and class instances used in the scheduling system
+	 */
 	public void initialise() {
 		diaries =new HashSet<>();
 		patients = new HashMap<>();
+		actions = new Stack<String>();
+		lastEdited = new Diary();
+		lastEditedApp = new Appointment();
 	}
 	
+	/**
+	 * Displays menu options and gets user input response
+	 * Returns -1 if a number is not entered
+	 * @return int option chosen
+	 */
 	public int displayMenu() {
 		System.out.println("---------- MENU ----------");
 		System.out.println("0) Exit  ");
-		System.out.println("1) ");
-		System.out.println("2) ");
-		System.out.println("3) ");
-		System.out.println("4) ");
-		System.out.println("5) ");
+		System.out.println("1) Add Appointment");
+		System.out.println("2) Delete Appointment");
+		System.out.println("3) Edit Appointment");
+		System.out.println("4) Undo");
+		System.out.println("5) Search for Apoointment");
+		System.out.println("6) Save Diary");
+		System.out.println("7) Load diary from file");
 
 		System.out.println("Enter Menu Choice (0-5)");
 		
-		return s.nextInt();
+		try {
+			return s.nextInt();
+		} catch (Exception e) {
+			System.out.println("Menu choice must be an integer from 0-7");
+			return -1;
+		}
+		
 	}
 	
+	
+	/**
+	 * 
+	 */
 	public void process() {
+		
 		int choice;
 		do {
 			choice = displayMenu();
@@ -46,37 +83,56 @@ public class Menu {
 				System.exit(0);
 				break;
 			case 1:
-				
+				scheduleAppointment();
+				actions.push("add");
 				System.out.println();
 				break;
 			case 2:
-				
+				deleteAppointment();
 				System.out.println();
+				actions.push("delete");
 				break;
 			case 3:
-			
+				editAppointment();
 				System.out.println();
+				actions.push("edit");
 				break;
 			case 4:
-				
+				undo();
 				System.out.println();
 				break;
 			case 5:
-				
+				search();
 				System.out.println();
 				break;
-			
+			case 6:
+				try {
+					saveDiary();
+				} catch (IOException e) {
+					
+					System.out.println("Diary could not be saved");
+				}
+				System.out.println();
+				break;
+			case 7:
+				try {
+					loadDiary();
+				} catch (IOException e) {
+					
+					System.out.println("Diary could not be found");
+				}
+				System.out.println();
+				break;
 			default:
 				System.out.println("Invalid Option");
 			}
 		} while (choice != 0);
 	}
 	
+	
 	/**
-	 * searches for an appointment.
+	 * searches for an appointment across all diaries.
 	 */
-	
-	
 	public Appointment search(){
 		System.out.println("Enter Appointment ID");
 		int wantedID = s.nextInt();
@@ -90,7 +146,7 @@ public class Menu {
 	}
 	
 	/**
-	 * schedules an appointment based on the diaries of the health professionals
+	 * schedules an appointment based on all the diaries of the health professionals employed
 	 */
 	public void scheduleAppointment() {
 		
@@ -169,12 +225,105 @@ public class Menu {
 		for (Diary d: neededHPs) {
 			Appointment a = new Appointment(appointment,location,patient,treatment);
 			d.addAppointment(a);
+			lastEdited = d;
+			lastEditedApp=a;
+
 		}
 		}else {
 			System.out.println("No availabile spaces for appointment");
 		}
 		
 
+	}
+	
+	/**
+	 * finds an appointment within the diary of the chosen health professional and deletes it
+	 * 
+	 */
+	public void deleteAppointment() {
+		Scanner s = new Scanner(System.in);
+		System.out.println("Enter Health Professional ID");
+		String id = s.next();
+		System.out.println("Enter Appointment ID");
+		String appId = s.next();
+
+		
+		for(Diary d: diaries) {
+			if( d.getOwner().id == Integer.parseInt(id)) {
+				Appointment newNode = d.findInDiary(Integer.parseInt(appId));
+				d.deleteAppointment(newNode);
+				lastEdited = d;
+				lastEditedApp = newNode;
+
+			}
+		}
+	}
+	
+	/**
+	 * changes the field values of users chosen health professional
+	 */
+	public void editAppointment() {
+		Scanner s = new Scanner(System.in);
+		System.out.println("Enter Health Professional ID");
+		String id = s.next();
+		
+		for(Diary d: diaries) {
+			if( d.getOwner().id == Integer.parseInt(id)) {
+				lastEditMade = d.editAppointment();
+				lastEdited = d;
+				
+				
+			}
+		}
+	}
+	
+	
+	/**
+	 * pops the last action off the Stack actions and reverses it
+	 * 
+	 */
+	public void undo() {
+		if(actions.pop()=="add") {
+			lastEdited.deleteAppointment(lastEditedApp);
+		}else if(actions.pop()=="delete") {
+			lastEdited.addAppointment(lastEditedApp);
+		}else if(actions.pop()=="edit") {
+			Appointment change = lastEdited.findInDiary(lastEditMade.getID());
+			change = lastEditMade;
+		}
+	}
+	
+	
+	/**
+	 * Saves the diary of a chosen health professional to an external file
+	 * @throws IOException
+	 */
+	public void saveDiary() throws IOException {
+		Scanner s = new Scanner(System.in);
+		System.out.println("Enter Health Professional ID");
+		String id = s.next();
+		
+		for(Diary d: diaries) {
+			if( d.getOwner().id == Integer.parseInt(id)) {
+				d.save(d.root, id);
+			}
+		}
+	}
+	
+	/**
+	 * Loads the diary of a chosen health professional from an external file.
+	 * @throws IOException
+	 */
+	public void loadDiary() throws IOException {
+		Scanner s = new Scanner(System.in);
+    	System.out.println("Enter Health Professional ID");
+    	String id = s.next();
+    	for(Diary d: diaries) {
+			if( d.getOwner().id == Integer.parseInt(id)) {
+				d.load(id);
+			}
+		}
+    	
 	}
 	
 	
@@ -186,5 +335,17 @@ public class Menu {
 	public void timeTaken() {
 		
 	}
+	
+	/**
+	 * main method which runs the scheduling program
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Menu menu = new Menu();
+		menu.process();
+		
+	}
+	
+
 	
 }
