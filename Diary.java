@@ -1,15 +1,23 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.Scanner;
 
 /**
  * 
- * SAME AS BINARYTREE CLASS
- * USE DATE AS ID
+ * Diary Class is a binary search tree with instances of Appointment class as nodes
+ * 
  *
  */
 public class Diary {
+	
+	
     HealthProfessional owner;
     Appointment root;
     Appointment currentNode;
@@ -17,6 +25,10 @@ public class Diary {
     Appointment previousNode;
     Set<Date> busy;
     
+    
+    /**
+     * Default constructor creates a blank instance of Diary
+     */
     public Diary() {
         root = null;
         currentNode = root;
@@ -26,10 +38,18 @@ public class Diary {
         busy = new HashSet<>();
     }
 
+    /**
+     * Gets the instance of HealthProfessional associated with this Diary
+     * @return HealthProfessional owner
+     */
     public HealthProfessional getOwner() {
         return owner;
     }
     
+    /**
+     * Checks if the diary tree has no nodes
+     * @return true if empty
+     */
     public boolean isDiaryEmpty()
     {
         return (root == null);
@@ -160,10 +180,12 @@ public class Diary {
     
     /**
      * edits fields of a single Appointment node in Diary tree
+     * @return the Appointment with unedited fields needed for undo implementation
      */
-    public void editAppointment() {
+    public Appointment editAppointment() {
         Scanner s = new Scanner(System.in);
         Appointment foundAppointment;
+        Appointment previousValues = null;
         int searchID;
         
         System.out.println("Enter the ID of the appointment you want to edit: ");
@@ -175,6 +197,7 @@ public class Diary {
         }
         else
         {
+        	previousValues =  findInDiary(searchID);
             System.out.println("Enter new date: ");
             findInDiary(searchID).setTreatment(s.next());
             
@@ -187,7 +210,9 @@ public class Diary {
             System.out.println("Enter new treatment: ");
             findInDiary(searchID).setTreatment(s.nextLine());
         }
+        return previousValues;
     }
+    
     
     /**
      * Traverses Diary comparing appointment IDs to wanted id until found
@@ -220,7 +245,11 @@ public class Diary {
         }
     }
     
-    
+    /**
+     * Creates a set of the times when an employee has appointments booked
+     * @param node
+     * @return
+     */
     public Set<Date> createBusy(Appointment node) {
 
         if (node != null) {
@@ -234,25 +263,59 @@ public class Diary {
         return busy;
     }
     
-    /**
-     * reverses the last action (edit, add or delete)
-     */
-    public void undo() {
-        
-    }
+    
     
     /**
      * saves the Diary to an external file
+     * @throws IOException 
      */
-    public void save() {
-        
-    }
+    public void save(Appointment a, String id) throws IOException {
+
+  		BufferedWriter bw = new BufferedWriter( new FileWriter(id+"_diary.txt",true) );
+  		
+  		
+  			if (isDiaryEmpty()) {
+  				System.out.println("Empty Diary");
+  			}
+  			if (a != null) {
+  				currentNode = a.getLeft();
+  				save(currentNode,id);
+  				
+  				bw.write(a.getID()+","+a.getLocation()+","+a.getTreatment()+","+a.getDate()+","+a.getPatient().getName());
+  				bw.flush();
+  				bw.newLine();
+  				
+  				currentNode = a.getRight();
+  				save(currentNode,id);
+  			}
+  			
+  			bw.close();		
+  		}
+    
     
     /**
      * loads a Diary from an external file
+     * @throws IOException 
      */
-    public void load() {
-        
+    public void load(String id) throws IOException {
+    	
+    	BufferedReader br = new BufferedReader( new FileReader(id+"_diary.txt") );
+  		
+      	String record;
+      		
+      	System.out.println("  ID\tLocation\tTreatment\tDate\tPatient Name\t\t\t");
+      	System.out.println(" ------------------------------------------------------------- ");
+      		
+      	while( ( record = br.readLine() ) != null ) {
+      			
+      		StringTokenizer st = new StringTokenizer(record,",");
+      			
+    		System.out.println("  "+st.nextToken()+"\t"+st.nextToken()+"\t"+st.nextToken()+"\t"+st.nextToken()+"\t"+st.nextToken()+"\t\t\t");
+      	}
+      		
+      	
+      	System.out.println(" ------------------------------------------------------------- ");
+      	br.close(); 
     }
     
     }
