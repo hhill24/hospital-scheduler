@@ -25,10 +25,11 @@ public class Menu {
 	Appointment lastEditMade; // keeps track of the last appointment to be changed.
 
 	/**
-	 * default constructor sets Set of diaries to null;
+	 * default constructor sets data structures and fields to empty;
 	 */
 	public Menu() {
-		diaries = null;
+		
+		
 	}
 
 	/**
@@ -41,6 +42,7 @@ public class Menu {
 		actions = new Stack<String>();
 		lastEdited = new Diary();
 		lastEditedApp = new Appointment();
+		
 	}
 
 	/**
@@ -51,19 +53,19 @@ public class Menu {
 	 */
 	public int displayMenu() {
 		System.out.println("---------- MENU ----------");
-		System.out.println("0) Exit  ");
+		System.out.println("0) Show Diary  ");
 		System.out.println("1) Add Appointment");
 		System.out.println("2) Delete Appointment");
 		System.out.println("3) Edit Appointment");
 		System.out.println("4) Undo");
-		System.out.println("5) Search for Apointment");
+		System.out.println("5) Search for Appointment");
 		System.out.println("6) Save Diary");
 		System.out.println("7) Load diary from file");
 		System.out.println("8) Add new health professional");
 		System.out.println("9) Add new patient");
 		System.out.println("10) Time Scheduling Function");
 
-		System.out.println("Enter Menu Choice (0-10)");
+		System.out.println("Enter Menu Choice (0-10) or enter 11 to Exit");
 
 		try {
 			return s.nextInt();
@@ -85,7 +87,7 @@ public class Menu {
 			switch (choice) {
 
 			case 0:
-				System.exit(0);
+				displayDiary();
 				break;
 			case 1:
 				scheduleAppointment();
@@ -146,6 +148,9 @@ public class Menu {
 			case 10:
 				timeTaken();
 				break;
+			case 11: 
+				System.exit(0);
+				break;
 			default:
 				System.out.println("Invalid Option");
 			}
@@ -205,8 +210,8 @@ public class Menu {
 
 		}
 
-		Date startDate = new Date(startInt[0], startInt[1], startInt[2], startInt[3], 0, 0);
-		Date endDate = new Date(endInt[0], endInt[1], endInt[2], endInt[3], 0, 0);
+		Date startDate = new Date(startInt[0], startInt[1]-1, startInt[2], startInt[3], 0, 0);
+		Date endDate = new Date(endInt[0], endInt[1]-1, endInt[2], endInt[3], 0, 0);
 
 		// creates a set of the diaries of the needed health professionals
 		Set<Diary> neededHPs = new HashSet<>();
@@ -222,12 +227,18 @@ public class Menu {
 		// required professionals are busy
 		Set<Date> allBusy = new HashSet<>();
 		for (Diary d : neededHPs) {
-			Set<Date> b = d.createBusy(d.root);
-			for (Date dd : b) {
-
-				if (dd.before(endDate) || dd.after(startDate)) {
+			Set<Date> busy = d.createBusy(d.root);
+			if(!busy.isEmpty()) {
+			for (Date dd : busy) {
+				System.out.println(busy); //test to see if busy has dates in it
+				//System.out.println(dd);
+				//System.out.println(startDate);
+				//System.out.println(endDate);
+				
+				if (dd.before(endDate) && dd.after(startDate)) {
 					allBusy.add(dd);
 				}
+			}
 			}
 
 		}
@@ -247,13 +258,14 @@ public class Menu {
 
 		// adds appointment to all necessary diaries if found
 		if (found) {
+			Appointment a = new Appointment(appointment, location, patient, treatment);
 			for (Diary d : neededHPs) {
-				Appointment a = new Appointment(appointment, location, patient, treatment);
 				d.addAppointment(a);
 				lastEdited = d;
 				lastEditedApp = a;
 
 			}
+			System.out.println("Appointment scheduled for "+ appointment);
 		} else {
 			System.out.println("No availabile spaces for appointment");
 		}
@@ -300,6 +312,21 @@ public class Menu {
 		}
 	}
 
+	/**
+	 * Prints a chosen employees diary
+	 */
+	public void displayDiary() {
+		System.out.println("Enter Health Professional ID");
+		String id = s.next();
+		for (Diary d : diaries) {
+			if (d.getOwner().id == Integer.parseInt(id)) {
+				System.out.println("  ID\tLocation\tTreatment\tDate\tPatient Name\t\t\t");
+				System.out.println(" ------------------------------------------------------------- ");
+				d.printTree(d.root);
+			}
+		}
+	}
+	
 	/**
 	 * pops the last action off the Stack actions and reverses it
 	 * 
@@ -400,6 +427,8 @@ public class Menu {
 		menu.process();
 
 	}
+
+
 
 
 
