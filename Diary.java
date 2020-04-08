@@ -21,20 +21,15 @@ public class Diary {
 	HealthProfessional owner;
 	Appointment root;
 	Appointment currentNode;
-	Appointment lastEditedNode;
 	Appointment previousNode;
-	Set<Date> busy;
+	Set<Date> busy = new HashSet<Date>();
 
 	/**
 	 * Default constructor creates a blank instance of Diary
 	 */
 	public Diary() {
 		root = null;
-		currentNode = root;
-		lastEditedNode = null;
-		previousNode = null;
-		owner = null;
-		busy = new HashSet<>();
+		
 	}
 
 	/**
@@ -162,7 +157,6 @@ public class Diary {
 	 */
 	public Appointment editAppointment() {
 		Scanner s = new Scanner(System.in);
-		Appointment foundAppointment;
 		Appointment previousValues = null;
 		int searchID;
 
@@ -177,13 +171,13 @@ public class Diary {
 			findInDiary(searchID).setTreatment(s.next());
 
 			System.out.println("Enter new location: ");
-			findInDiary(searchID).setTreatment(s.nextLine());
+			findInDiary(searchID).setTreatment(s.next());
 
 			System.out.println("Enter new patient: ");
-			findInDiary(searchID).setTreatment(s.nextLine());
+			findInDiary(searchID).setTreatment(s.next());
 
 			System.out.println("Enter new treatment: ");
-			findInDiary(searchID).setTreatment(s.nextLine());
+			findInDiary(searchID).setTreatment(s.next());
 		}
 		return previousValues;
 	}
@@ -237,10 +231,30 @@ public class Diary {
 
 		return busy;
 	}
+	
+	/**
+	 * Prints all appointment nodes in the diary tree
+	 * 
+	 * @param node
+	 * @return
+	 */
+	public void printTree(Appointment node) {
+
+		if (node != null) {
+			currentNode = node.getLeft();
+			printTree(currentNode);
+			System.out.println(node.getID() + "," + node.getLocation() + "," + node.getTreatment() + "," + node.getDate() + ","+ node.getPatient().getName());
+			currentNode = node.getRight();
+			printTree(currentNode);
+		}
+
+		
+	}
+
 
 	/**
 	 * saves the Diary to an external file
-	 * 
+	 * Recursive function
 	 * @throws IOException
 	 */
 	public void save(Appointment a, String id) throws IOException {
@@ -254,8 +268,7 @@ public class Diary {
 			currentNode = a.getLeft();
 			save(currentNode, id);
 
-			bw.write(a.getID() + "," + a.getLocation() + "," + a.getTreatment() + "," + a.getDate() + ","
-					+ a.getPatient().getName());
+			bw.write(a.getID() + "," + a.getLocation() + "," + a.getTreatment() + "," + a.getDate() + ","+ a.getPatient().getName());
 			bw.flush();
 			bw.newLine();
 
