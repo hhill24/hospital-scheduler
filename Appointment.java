@@ -19,13 +19,8 @@ public class Appointment {
 	 * Default constructor that creates a blank instance of Appointment
 	 */
 	public Appointment() {
-		date = null;
-		location = "";
-		patient = null;
-		treatment = "";
 		ID++;
-		leftNode = null;
-		rightNode = null;
+		
 
 	}
 
@@ -37,11 +32,11 @@ public class Appointment {
 	 * @param patient
 	 * @param theTreatment
 	 */
-	public Appointment(Date theDate, String theLoc, Patient patient, String theTreatment) {
-		date = null;
-		location = "";
-		patient = null;
-		treatment = "";
+	public Appointment(Date theDate, String theLoc, Patient thepatient, String theTreatment) {
+		date = theDate;
+		location = theLoc;
+		patient = thepatient;
+		treatment = theTreatment;
 		ID++;
 		leftNode = null;
 		rightNode = null;
@@ -174,3 +169,4 @@ public class Appointment {
 		rightNode = newRightNode;
 	}
 }
+
